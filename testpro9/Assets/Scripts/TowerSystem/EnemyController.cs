@@ -4,6 +4,12 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
+
+    public float speedMod = 1.0f;
+    public float timeSinceStart = 0.0f;
+    public bool modeEnd = true; // state 상태 설정 bool
+
+
     public float moveSpeed;
     private EnemyPath thePath;  // 몬스터가 가지고있는 Path값
     private int currentPoint;
@@ -19,13 +25,24 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
+
+        if(modeEnd == false)
+        {
+            timeSinceStart -= Time.deltaTime;
+            if (timeSinceStart <= 0.01)
+            {
+                speedMod = 1.0f;
+                modeEnd = true;
+            }
+
+        }
         if(reachEnd == false) // if(!reachEnd0 도달 이전
         {
             transform.LookAt(thePath.points[currentPoint]); // 몬스터는 지금 방향을 향해서 본다 (look at)
 
             // moveTowerd 함수 (내 위치,타겟 속도,속도값)
             transform.position =
-                Vector3.MoveTowards(transform.position, thePath.points[currentPoint].position, moveSpeed * Time.deltaTime);
+                Vector3.MoveTowards(transform.position, thePath.points[currentPoint].position, moveSpeed * Time.deltaTime * speedMod);
 
             if (Vector3.Distance(transform.position, thePath.points[currentPoint].position) < 0.01f)
             {
@@ -36,7 +53,15 @@ public class EnemyController : MonoBehaviour
                 }
             }
         }
+
         
+        
+    }
+    public void SetMode(float Value)
+    {
+        modeEnd = false;
+        speedMod = Value;
+        timeSinceStart = 2.0f;
     }
 
 }
